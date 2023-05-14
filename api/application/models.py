@@ -61,7 +61,7 @@ class Bookmaker(db.Model):
     commence_time = db.Column(db.String(20))
     last_update = db.Column(db.String(20), unique=True)
 
-class BookmakerSchema(db.Model):
+class BookmakerSchema():
     resource_fields = {
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
@@ -89,7 +89,7 @@ class MoneylineMarket(db.Model):
     away_team = db.Column(db.String(23))
     home_team_price = db.Column(db.Integer)  
     away_team_price = db.Column(db.Integer)
-class MoneylineMarketSchema(db.Model):
+class MoneylineMarketSchema():
     resource_fields = {
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
@@ -119,7 +119,7 @@ class SpreadMarket(db.Model):
     away_team_price = db.Column(db.Integer)
     home_team_points = db.Column(db.Integer)  
     away_team_points = db.Column(db.Integer)
-class SpreadMarketSchema(db.Model):
+class SpreadMarketSchema():
     resource_fields = {
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
@@ -149,7 +149,7 @@ class TotalsMarket(db.Model):
     under_price = db.Column(db.Integer)
     over_points = db.Column(db.Integer)  
     under_points = db.Column(db.Integer)
-class TotalsMarketSchema(db.Model):
+class TotalsMarketSchema():
     resource_fields = {
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
