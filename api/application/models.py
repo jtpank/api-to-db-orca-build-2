@@ -1,7 +1,10 @@
 from . import db
 from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 import json
-
+#sports
+# "key":"americanfootball_ncaaf"
+#"americanfootball_nfl"
+#"basketball_nba"
 #User and Schema
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
