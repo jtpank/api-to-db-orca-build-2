@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   flask-api:
-    image: python:3.9
-    command: pip install -r ./api/requirements.txt && pwd
+    image: python:3.7-alpine
     ports:
       - "5000:5000"
     depends_on:
@@ -18,6 +17,14 @@ services:
       MYSQL_DB: historical_odds
     secrets:
       - mysql_password
+    command: >
+      sh -c 'pip install --upgrade pip &&
+        apk add --no-cache build-base mariadb-dev &&
+        adduser -D myuser &&
+        chown -R myuser:myuser /api &&
+        su myuser -c "pip install --user -r ./api/requirements.txt" &&
+        su myuser -c "python ./api/app.py"
+      '
   historical-database:
     image: mysql:8.0
     volumes:
