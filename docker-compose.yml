@@ -2,16 +2,16 @@ version: '3.8'
 
 services:
   flask-api:
-    image: python:3.7-alpine
+    image: python:3.8-alpine
     ports:
-      - "5000:5000"
+      - 5000:5000
     depends_on:
       - historical-database
     volumes:
       - ./:/api
     working_dir: /api
     environment:
-      MYSQL_HOST: historical-database
+      MYSQL_HOST: mysql
       MYSQL_USER: root
       MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
       MYSQL_DB: historical_odds
@@ -26,9 +26,11 @@ services:
         su myuser -c "python ./api/app.py"
       '
   historical-database:
-    image: mysql:8.0
+    image: mysql:latest
     volumes:
       - orca-historical-odds:/var/lib/mysql
+    ports:
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
       MYSQL_DATABASE: historical_odds
@@ -41,4 +43,5 @@ secrets:
     file: ./mysql_password.txt
   mysql_root_password:
     file: ./mysql_root_password.txt
+#MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
     

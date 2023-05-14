@@ -9,6 +9,7 @@ from datetime import timedelta
 from werkzeug.middleware.proxy_fix import ProxyFix
 #note if insalling manually:
 # pip install mysqlclient (mix os/ python 3)
+#apk install mariadb-dev
 # otherwise:
 # python3 -m pip install package
 db = SQLAlchemy()
@@ -22,8 +23,6 @@ def create_app():
     with app.app_context():
         from . import models
         db.create_all()
-        from . import routes
-        app.register_blueprint(routes.main_app_frontend)
         from . import api_routes
         app.register_blueprint(api_routes.api_main)
         # app.wsgi_app = ProxyFix(
