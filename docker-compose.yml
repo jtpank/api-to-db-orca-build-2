@@ -3,7 +3,7 @@ version: '3.8'
 services:
   flask-api:
     image: python:3.9
-    command: python ./api/app.py
+    command: pip install -r ./api/requirements.txt && pwd
     ports:
       - "5000:5000"
     depends_on:
