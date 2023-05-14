@@ -3,14 +3,14 @@ version: '3.8'
 services:
   flask-api:
     image: python:3.9
-    command: python ./app/app.py
+    command: python ./api/app.py
     ports:
       - "5000:5000"
     depends_on:
       - historical-database
     volumes:
-      - ./:/app
-    working_dir: /app
+      - ./:/api
+    working_dir: /api
     environment:
       MYSQL_HOST: historical-database
       MYSQL_USER: root
