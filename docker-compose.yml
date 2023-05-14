@@ -6,7 +6,7 @@ services:
     ports:
       - 5000:5000
     depends_on:
-      - historical-database
+      - historical-nba-database
     volumes:
       - ./:/api
     working_dir: /api
@@ -14,7 +14,7 @@ services:
       MYSQL_HOST: mysql
       MYSQL_USER: root
       MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
-      MYSQL_DB: historical_odds
+      MYSQL_DB: historical_nba_odds
     secrets:
       - mysql_password
     command: >
@@ -25,19 +25,19 @@ services:
         su myuser -c "pip install --user -r ./api/requirements.txt" &&
         su myuser -c "python ./api/app.py"
       '
-  historical-database:
+  historical-nba-database:
     image: mysql:latest
     volumes:
-      - orca-historical-odds:/var/lib/mysql
+      - orca-historical-nba-odds:/var/lib/mysql
     ports:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
-      MYSQL_DATABASE: historical_odds
+      MYSQL_DATABASE: historical_nba_odds
     secrets:
       - mysql_root_password
 volumes:
-  orca-historical-odds:
+  orca-historical-nba-odds:
 secrets:
   mysql_password:
     file: ./mysql_password.txt

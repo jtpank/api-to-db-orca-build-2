@@ -28,17 +28,23 @@ def abort_if_table_none(data):
         abort(404, error_message_field="Field: table does not exist")
 
 #User login and sign up routes + protected route example:
-
-class protectedRoute(Resource):
-    @jwt_required()
+class live_nba_odds_data(Resource):
     def get(self):
-        # Access the identity of the current user with get_jwt_identity
-        current_user = get_jwt_identity()
-        return make_response(jsonify(logged_in_as=current_user), 200)
+        data = {'message': "live_nba_odds_data get route"}
+        return data, 200
+    def put(self):
+        try:
+            data =  {
+                "message": "return message",
+                }
+            return data, 200
+        except Exception as e:
+            return {'message': 'Failed to put live_nba_odds_data data: {}'.format(str(e))}, 500
+
 
 class index_class(Resource):
     def get(self):
         return {"api-for-dk" : "index_page"}
 #add resources
 api.add_resource(index_class, '/api')
-api.add_resource(protectedRoute, '/api/protected')
+api.add_resource(index_class, '/api/live_nba_odds_data')
