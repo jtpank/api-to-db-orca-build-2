@@ -77,12 +77,6 @@ class live_nba_odds_data(Resource):
     #     data = {'message': "live_nba_odds_data get route"}
     #     return data, 200
     def get(self):
-        #example: /api/fetch-api1-data?sport=${sport}&endpoint=${endpoint}&date=${dateIsoString}`
-        # maps to     
-        # const oddsAPI = `https://api.the-odds-api.com/v4/sports/${sport}/${endpoint}`;
-        # const apiKey = process.env.REACT_APP_ODDS_API_API_KEY;
-        # //the following are defaults
-        # const fullAPI = `${oddsAPI}?apiKey=${apiKey}&dateFormat=iso&date=${dateIsoString}`;
         sport = request.args.get('sport', default = "", type = str)
         endpoint = request.args.get('endpoint', default = "", type = str)
         date = request.args.get('date', default = "", type = str)

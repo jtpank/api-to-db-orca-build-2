@@ -30,10 +30,11 @@ services:
     volumes:
       - orca-historical-nba-odds:/var/lib/mysql
     ports:
-      - 3306:3306
+      - 3307:3307
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
       MYSQL_DATABASE: historical_nba_odds
+      MYSQL_TCP_PORT: 3307
     secrets:
       - mysql_root_password
 volumes:
