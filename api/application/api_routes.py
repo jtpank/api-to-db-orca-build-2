@@ -297,7 +297,7 @@ class get_nba_games(Resource):
                         "away_team_score": record.away_team_score,
                         "completed": record.completed,
                     }
-                data.append(item)
+                    data.append(item)
             return {"data" : data}, 200
         except Exception as e:
             return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
