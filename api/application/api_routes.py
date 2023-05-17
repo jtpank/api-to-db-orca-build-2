@@ -295,7 +295,7 @@ class get_nba_games(Resource):
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
                         "sport_key": record.sport_key,
-                        "commence_time": record.commence_time,
+                        "commence_time": record.commence_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
                         "home_team": record.home_team,
                         "away_team": record.away_team,
                         "home_team_score": record.home_team_score,
