@@ -89,6 +89,7 @@ class MoneylineMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     odds_api_game_id = db.Column(db.String(32))
     sport_key = db.Column(db.String(25))
+    odds_api_bookmaker_key = db.Column(db.String(30))
     commence_time = db.Column(db.String(20))
     last_update = db.Column(db.String(20), unique=True)
     home_team = db.Column(db.String(23))
@@ -100,6 +101,7 @@ class MoneylineMarketSchema():
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
         "sport_key": fields.String,
+        "odds_api_bookmaker_key": fields.String,
         "commence_time": fields.String,
         "last_update": fields.String,
         "home_team": fields.String,
@@ -117,6 +119,7 @@ class SpreadMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     odds_api_game_id = db.Column(db.String(32))
     sport_key = db.Column(db.String(25))
+    odds_api_bookmaker_key = db.Column(db.String(30))
     commence_time = db.Column(db.String(20))
     last_update = db.Column(db.String(20), unique=True)
     home_team = db.Column(db.String(23))
@@ -130,6 +133,7 @@ class SpreadMarketSchema():
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
         "sport_key": fields.String,
+        "odds_api_bookmaker_key": fields.String,
         "commence_time": fields.String,
         "last_update": fields.String,
         "home_team": fields.String,
@@ -149,6 +153,7 @@ class TotalsMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     odds_api_game_id = db.Column(db.String(32))
     sport_key = db.Column(db.String(25))
+    odds_api_bookmaker_key = db.Column(db.String(30))
     commence_time = db.Column(db.String(20))
     last_update = db.Column(db.String(20), unique=True)
     over_price = db.Column(db.Integer)  
@@ -160,6 +165,7 @@ class TotalsMarketSchema():
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
         "sport_key": fields.String,
+        "odds_api_bookmaker_key": fields.String,
         "commence_time": fields.String,
         "last_update": fields.String,
         "over_price": fields.Integer,

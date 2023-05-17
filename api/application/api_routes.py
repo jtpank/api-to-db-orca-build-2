@@ -177,6 +177,7 @@ class live_nba_odds_data(Resource):
                                     MoneylineMarket.odds_api_game_id == odds_api_game_id,
                                     MoneylineMarket.last_update == last_update,
                                     MoneylineMarket.commence_time == commence_time,
+                                    MoneylineMarket.odds_api_bookmaker_key == odds_api_bookmaker_key,
                                     ).all()
                                 if moneylineDataQuery is None or len(moneylineDataQuery) == 0:
                                     home_team = market["outcomes"][0]["name"]
@@ -186,6 +187,7 @@ class live_nba_odds_data(Resource):
                                     obj = {
                                         "odds_api_game_id": odds_api_game_id,
                                         "sport_key": sport,
+                                        "odds_api_bookmaker_key": odds_api_bookmaker_key,
                                         "commence_time": commence_time,
                                         "last_update": last_update,
                                         "home_team": home_team,
@@ -202,6 +204,7 @@ class live_nba_odds_data(Resource):
                                     SpreadMarket.odds_api_game_id == odds_api_game_id,
                                     SpreadMarket.last_update == last_update,
                                     SpreadMarket.commence_time == commence_time,
+                                    SpreadMarket.odds_api_bookmaker_key == odds_api_bookmaker_key,
                                     ).all()
                                 if spreadDataQuery is None or len(spreadDataQuery) == 0:
                                     home_team = market["outcomes"][0]["name"]
@@ -213,6 +216,7 @@ class live_nba_odds_data(Resource):
                                     obj = {
                                         "odds_api_game_id": odds_api_game_id,
                                         "sport_key": sport,
+                                        "odds_api_bookmaker_key": odds_api_bookmaker_key,
                                         "commence_time": commence_time,
                                         "last_update": last_update,
                                         "home_team": home_team,
@@ -231,6 +235,7 @@ class live_nba_odds_data(Resource):
                                     TotalsMarket.odds_api_game_id == odds_api_game_id,
                                     TotalsMarket.last_update == last_update,
                                     TotalsMarket.commence_time == commence_time,
+                                    TotalsMarket.odds_api_bookmaker_key == odds_api_bookmaker_key,
                                     ).all()
                                 if totalDataQuery is None or len(totalDataQuery) == 0:
                                     over_price = market["outcomes"][0]["price"]
@@ -240,6 +245,7 @@ class live_nba_odds_data(Resource):
                                     obj = {
                                         "odds_api_game_id": odds_api_game_id,
                                         "sport_key": sport,
+                                        "odds_api_bookmaker_key": odds_api_bookmaker_key,
                                         "commence_time": commence_time,
                                         "last_update": last_update,
                                         "over_price": over_price,
