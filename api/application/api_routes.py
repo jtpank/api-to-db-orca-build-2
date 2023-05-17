@@ -9,6 +9,7 @@ from .models import db, SpreadMarket, Bookmaker, MoneylineMarket, TotalsMarket, 
 from dotenv import load_dotenv
 import requests
 import os
+from datetime import datetime
 load_dotenv()
 api_main = Blueprint('api', __name__, template_folder='templates')
 api = Api(api_main)
@@ -79,7 +80,8 @@ class live_nba_game_scores_route(Resource):
                 for i in range(len(data)):
                     odds_api_game_id = data[i]["id"]
                     sport_key = data[i]["sport_key"]
-                    commence_time = data[i]["commence_time"]
+                    commence_time_str = data[i]["commence_time"]
+                    commence_time = datetime.strptime(commence_time_str, '%Y-%m-%dT%H:%M:%SZ')
                     home_team = data[i]["home_team"]
                     away_team = data[i]["away_team"]
                     home_team_score = 0
@@ -145,7 +147,8 @@ class live_nba_odds_data(Resource):
                     bookmakerList = data[i]["bookmakers"]
                     odds_api_game_id = data[i]["id"]
                     sport_key = sport
-                    commence_time = data[i]["commence_time"]
+                    commence_time_str = data[i]["commence_time"]
+                    commence_time = datetime.strptime(commence_time_str, '%Y-%m-%dT%H:%M:%SZ')
                     #really a book data point
                     for book in bookmakerList:
                         odds_api_bookmaker_key = book["key"]
@@ -274,6 +277,22 @@ class live_nba_odds_data(Resource):
         except Exception as e:
             return {'message': 'Failed to put live_nba_odds_data data: {}'.format(str(e))}, 500
 
+class get_nba_games(Resource):
+    def get(self):
+        #to our own db now
+        sport = request.args.get('sport', default = "", type = str)
+        date = request.args.get('date', default = "", type = str)
+        # try:
+        #     # start_time = 
+        #     # end_time = 
+        #     # gameScoreQuery = db.session.query(LiveNbaData).filter(
+        #     #             LiveNbaData.commence_time.between(start_time, end_time)
+        #     #             ).all()
+        #     return {"data" : data}, 200
+        #     else:
+        #         return {"message": "no nba live / upcoming games to store on the specified date"}, 200
+        # except Exception as e:
+        #     return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
 
 
 class index_class(Resource):
