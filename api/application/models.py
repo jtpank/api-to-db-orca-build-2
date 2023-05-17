@@ -38,6 +38,7 @@ class LiveNbaData(db.Model):
     away_team = db.Column(db.String(23))
     home_team_score = db.Column(db.Integer)
     away_team_score = db.Column(db.Integer)
+    completed = db.Column(db.Integer)
 
 class LiveNbaDataSchema():
     resource_fields = {
@@ -49,6 +50,7 @@ class LiveNbaDataSchema():
         "away_team": fields.String,
         "home_team_score": fields.Integer,
         "away_team_score": fields.Integer,
+        "completed": fields.Integer,
     }
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)

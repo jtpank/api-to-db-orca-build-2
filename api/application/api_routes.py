@@ -5,7 +5,7 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from flask import current_app, Blueprint, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, and_, distinct, or_
-from .models import db, SpreadMarket, SpreadMarketSchema, Bookmaker, BookmakerSchema, MoneylineMarket, MoneylineMarketSchema, TotalsMarket, TotalsMarketSchema
+from .models import db, SpreadMarket, Bookmaker, MoneylineMarket, TotalsMarket, LiveNbaData
 from dotenv import load_dotenv
 import requests
 import os
@@ -58,19 +58,66 @@ def abort_if_table_none(data):
 # "away_team":"Los Angeles Lakers",
 # "scores":null,"last_update":null}
 # ]
-class live_nba_data_route(Resource):
+class live_nba_game_scores_route(Resource):
     def get(self):
-        data = {'message': "live_nba_data_route (for game schedule)"}
-        return data, 200
-    def put(self):
+        sport = request.args.get('sport', default = "", type = str)
+        endpoint = request.args.get('endpoint', default = "", type = str)
+        date = request.args.get('date', default = "", type = str)
+        apiKey = os.getenv("API_KEY")
+        #&regions=us&markets=h2h,spreads,totals
+        #example req: http://localhost:5000/api/live_nba_odds_data?sport=basketball_nba&endpoint=odds&date=2023-05-17T00:00:00Z
+        #https://api.the-odds-api.com/v4/sports/basketball_nba/scores?apiKey=f2c87d0ea0ee1e114c5e603c9693aa7b&dateFormat=iso&date=2023-05-17T00:00:00Z
+        odds_api_url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores?apiKey={apiKey}&dateFormat=iso&date={date}"
+        #make request and store the data
         try:
-            data =  {
-                "message": "return message",
-                }
-            return data, 200
+            response = requests.get(odds_api_url)
+            response.raise_for_status()
+            data = response.json()
+            #array of game objects in the data
+            if len(data) > 0:
+                print("data len greater than 0")
+                for i in range(len(data)):
+                    odds_api_game_id = data[i]["id"]
+                    sport_key = data[i]["sport_key"]
+                    commence_time = data[i]["commence_time"]
+                    home_team = data[i]["home_team"]
+                    away_team = data[i]["away_team"]
+                    home_team_score = 0
+                    away_team_score = 0
+                    completed = data[i]["completed"]
+                    if data[i]["scores"] is not None and len(data[i]["scores"]) > 0:
+                        home_team_score = data[i]["scores"][0]["score"]
+                        away_team_score = data[i]["scores"][1]["score"]
+                    #now make the query and store it if doesn't exist
+                    gameScoreQuery = db.session.query(LiveNbaData).filter(
+                        LiveNbaData.odds_api_game_id == odds_api_game_id,
+                        LiveNbaData.sport_key == sport_key,
+                        LiveNbaData.commence_time == commence_time,
+                        ).first()
+                    if gameScoreQuery is None:
+                        obj = {
+                            "odds_api_game_id": odds_api_game_id,
+                            "sport_key": sport_key,
+                            "commence_time": commence_time,
+                            "home_team": home_team,
+                            "away_team": away_team,
+                            "home_team_score": home_team_score,
+                            "away_team_score": away_team_score,
+                            "completed" : completed,
+                        }
+                        #insert into db
+                        _obj = LiveNbaData(**obj)
+                        db.session.add(_obj)
+                    else:
+                        gameScoreQuery.home_team_score = home_team_score
+                        gameScoreQuery.away_team_score = away_team_score
+                        gameScoreQuery.completed = completed
+                db.session.commit()
+                return {"message": "successfully stored nba games in db"}, 200
+            else:
+                return {"message": "no nba live / upcoming games to store on the specified date"}, 200
         except Exception as e:
             return {'message': 'Failed to put live_nba_data_route data: {}'.format(str(e))}, 500
-
 
 class live_nba_odds_data(Resource):
     # def get(self):
@@ -228,5 +275,5 @@ class index_class(Resource):
         return {"api-for-orca-to-db" : "index_page"}
 #add resources
 api.add_resource(index_class, '/api')
-api.add_resource(live_nba_data_route, '/api/live-nba-data')
-api.add_resource(live_nba_odds_data, '/api/live_nba_odds_data')
+api.add_resource(live_nba_game_scores_route, '/api/live-nba-scores-data')
+api.add_resource(live_nba_odds_data, '/api/live-nba-odds-data')
