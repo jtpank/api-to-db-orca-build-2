@@ -279,17 +279,18 @@ class get_nba_games(Resource):
         date_str = request.args.get('date', default = "", type = str)
         try:
             date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
-            start_time = date - timedelta(hours=24)
-            end_time = date + timedelta(hours=24)
+            start_time = date - timedelta(hours=72)
+            end_time = date + timedelta(hours=72)
             gameScoreQuery = db.session.query(LiveNbaData).filter(
-                        LiveNbaData.commence_time.between(start_time, end_time)
+                        LiveNbaData.commence_time.between(start_time, end_time),
+                        LiveNbaData.completed == False,
                         ).all()
             print(gameScoreQuery)
             data = []
             if gameScoreQuery is not None:
                 print("not none")
                 for record in gameScoreQuery:
-                    print("record found in get nba games query")
+                    print("record found in get nba games")
                     print(record)
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
