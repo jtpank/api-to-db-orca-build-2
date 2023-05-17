@@ -307,6 +307,40 @@ class get_nba_games(Resource):
         except Exception as e:
             return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
 
+class get_pre_nba_game_odds_h2h_data(Resource):
+    def get(self):
+        #to our own db now
+        bookmaker_key = request.args.get('bookmakerKey', default = "", type = str)
+        date_str = request.args.get('date', default = "", type = str)
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+            start_time = date - timedelta(hours=72)
+            end_time = date + timedelta(hours=72)
+            moneylineQuery = db.session.query(MoneylineMarket).filter(
+                        MoneylineMarket.commence_time > start_time,
+                        MoneylineMarket.odds_api_bookmaker_key == bookmaker_key,
+                        MoneylineMarket.completed == False,
+                        ).all()
+            print(moneylineQuery)
+            data = []
+            if moneylineQuery is not None:
+                print("not none")
+                for record in moneylineQuery:
+                    item = {
+                        "odds_api_game_id": record.odds_api_game_id,
+                        "sport_key": record.sport_key,
+                        "odds_api_bookmaker_key": fields.String,
+                        "commence_time": record.commence_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "last_update": record.last_update.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "home_team": record.home_team,
+                        "away_team": record.away_team,
+                        "home_team_price": record.home_team_price,
+                        "away_team_price": record.home_team_price,
+                    }
+                    data.append(item)
+            return {"data" : data}, 200
+        except Exception as e:
+            return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
 
 class index_class(Resource):
     def get(self):
@@ -316,3 +350,4 @@ api.add_resource(index_class, '/api')
 api.add_resource(live_nba_game_scores_route, '/api/live-nba-scores-data')
 api.add_resource(live_nba_odds_data, '/api/live-nba-odds-data')
 api.add_resource(get_nba_games, '/api/get/live-nba-scores-data')
+api.add_resource(get_pre_nba_game_odds_h2h_data, '/api/get/pre-game-nba-odds-h2h-data')
