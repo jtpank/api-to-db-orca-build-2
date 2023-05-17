@@ -284,9 +284,13 @@ class get_nba_games(Resource):
             gameScoreQuery = db.session.query(LiveNbaData).filter(
                         LiveNbaData.commence_time.between(start_time, end_time)
                         ).all()
+            print(gameScoreQuery)
+            data = []
             if gameScoreQuery is not None:
-                data = []
+                print("not none")
                 for record in gameScoreQuery:
+                    print("record found in get nba games query")
+                    print(record)
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
                         "sport_key": record.sport_key,
