@@ -151,7 +151,8 @@ class live_nba_odds_data(Resource):
                     for book in bookmakerList:
                         odds_api_bookmaker_key = book["key"]
                         odds_api_bookmaker_title = book["title"]
-                        last_update = book["last_update"]
+                        last_update_time_str = book["last_update"]
+                        last_update = datetime.strptime(last_update_time_str, '%Y-%m-%dT%H:%M:%SZ')
                         #now make the query and store it if doesn't exist
                         bookMakerDataQuery = db.session.query(Bookmaker).filter(
                             Bookmaker.odds_api_game_id == odds_api_game_id,

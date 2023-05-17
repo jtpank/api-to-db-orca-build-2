@@ -64,7 +64,7 @@ class Bookmaker(db.Model):
     odds_api_bookmaker_key = db.Column(db.String(30))
     odds_api_bookmaker_title = db.Column(db.String(30))
     commence_time = db.Column(db.DateTime)
-    last_update = db.Column(db.String(20))
+    last_update = db.Column(db.DateTime)
 
 class BookmakerSchema():
     resource_fields = {
@@ -74,14 +74,13 @@ class BookmakerSchema():
         "odds_api_bookmaker_key": fields.String,
         "odds_api_bookmaker_title": fields.String,
         "commence_time": fields.DateTime,
-        "last_update": fields.String,
+        "last_update": fields.DateTime,
     }
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)
     args_field.add_argument("odds_api_game_id", type=str,help="odds_api_game_id is required", required=True)
     args_field.add_argument("odds_api_bookmaker_key", type=str,help="odds_api_bookmaker_key is required", required=True)
     args_field.add_argument("odds_api_bookmaker_title", type=str,help="odds_api_bookmaker_title is required", required=True)
-    args_field.add_argument("last_update", type=str,help="last_update is required", required=True)
 
 class MoneylineMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,7 +88,7 @@ class MoneylineMarket(db.Model):
     sport_key = db.Column(db.String(25))
     odds_api_bookmaker_key = db.Column(db.String(30))
     commence_time = db.Column(db.DateTime)
-    last_update = db.Column(db.String(20))
+    last_update = db.Column(db.DateTime)
     home_team = db.Column(db.String(23))
     away_team = db.Column(db.String(23))
     home_team_price = db.Column(db.Integer)  
@@ -101,7 +100,7 @@ class MoneylineMarketSchema():
         "sport_key": fields.String,
         "odds_api_bookmaker_key": fields.String,
         "commence_time": fields.DateTime,
-        "last_update": fields.String,
+        "last_update": fields.DateTime,
         "home_team": fields.String,
         "away_team": fields.String,
         "home_team_price": fields.Integer,
@@ -110,7 +109,6 @@ class MoneylineMarketSchema():
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)
     args_field.add_argument("odds_api_game_id", type=str,help="odds_api_game_id is required", required=True)
-    args_field.add_argument("last_update", type=str,help="last_update is required", required=True)
     
 class SpreadMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -118,7 +116,7 @@ class SpreadMarket(db.Model):
     sport_key = db.Column(db.String(25))
     odds_api_bookmaker_key = db.Column(db.String(30))
     commence_time = db.Column(db.DateTime)
-    last_update = db.Column(db.String(20))
+    last_update = db.Column(db.DateTime)
     home_team = db.Column(db.String(23))
     away_team = db.Column(db.String(23))
     home_team_price = db.Column(db.Integer)  
@@ -132,7 +130,7 @@ class SpreadMarketSchema():
         "sport_key": fields.String,
         "odds_api_bookmaker_key": fields.String,
         "commence_time": fields.DateTime,
-        "last_update": fields.String,
+        "last_update": fields.DateTime,
         "home_team": fields.String,
         "away_team": fields.String,
         "home_team_price": fields.Integer,
@@ -143,7 +141,6 @@ class SpreadMarketSchema():
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)
     args_field.add_argument("odds_api_game_id", type=str,help="odds_api_game_id is required", required=True)
-    args_field.add_argument("last_update", type=str,help="last_update is required", required=True)
 
 class TotalsMarket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -151,7 +148,7 @@ class TotalsMarket(db.Model):
     sport_key = db.Column(db.String(25))
     odds_api_bookmaker_key = db.Column(db.String(30))
     commence_time = db.Column(db.DateTime)
-    last_update = db.Column(db.String(20))
+    last_update = db.Column(db.DateTime)
     over_price = db.Column(db.Integer)  
     under_price = db.Column(db.Integer)
     over_points = db.Column(db.Integer)  
@@ -163,7 +160,7 @@ class TotalsMarketSchema():
         "sport_key": fields.String,
         "odds_api_bookmaker_key": fields.String,
         "commence_time": fields.DateTime,
-        "last_update": fields.String,
+        "last_update": fields.DateTime,
         "over_price": fields.Integer,
         "under_price": fields.Integer,
         "over_points": fields.Integer,
@@ -172,4 +169,3 @@ class TotalsMarketSchema():
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)
     args_field.add_argument("odds_api_game_id", type=str,help="odds_api_game_id is required", required=True)
-    args_field.add_argument("last_update", type=str,help="last_update is required", required=True)
