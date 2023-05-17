@@ -9,7 +9,7 @@ from .models import db, SpreadMarket, Bookmaker, MoneylineMarket, TotalsMarket, 
 from dotenv import load_dotenv
 import requests
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 load_dotenv()
 api_main = Blueprint('api', __name__, template_folder='templates')
 api = Api(api_main)
@@ -276,18 +276,22 @@ class get_nba_games(Resource):
     def get(self):
         #to our own db now
         sport = request.args.get('sport', default = "", type = str)
-        date = request.args.get('date', default = "", type = str)
-        # try:
-        #     # start_time = 
-        #     # end_time = 
-        #     # gameScoreQuery = db.session.query(LiveNbaData).filter(
-        #     #             LiveNbaData.commence_time.between(start_time, end_time)
-        #     #             ).all()
-        #     return {"data" : data}, 200
-        #     else:
-        #         return {"message": "no nba live / upcoming games to store on the specified date"}, 200
-        # except Exception as e:
-        #     return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
+        date_str = request.args.get('date', default = "", type = str)
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+            start_time = date - timedelta(hours=24)
+            end_time = date + timedelta(hours=24)
+            gameScoreQuery = db.session.query(LiveNbaData).filter(
+                        LiveNbaData.commence_time.between(start_time, end_time)
+                        ).all()
+            if gameScoreQuery is not None:
+                for record in gameScoreQuery:
+                    print("odds_api_game_id:", record.odds_api_game_id)
+                    print("sport_key:", record.sport_key)
+                    print("commence_time:", record.commence_time)
+            return {"data" : "hi from get"}, 200
+        except Exception as e:
+            return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
 
 
 class index_class(Resource):
@@ -297,3 +301,4 @@ class index_class(Resource):
 api.add_resource(index_class, '/api')
 api.add_resource(live_nba_game_scores_route, '/api/live-nba-scores-data')
 api.add_resource(live_nba_odds_data, '/api/live-nba-odds-data')
+api.add_resource(get_nba_games, '/api/get/live-nba-scores-data')
