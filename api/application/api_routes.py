@@ -5,7 +5,7 @@ from flask_restful import reqparse, abort, Api, Resource, fields, marshal_with
 from flask import current_app, Blueprint, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, and_, distinct, or_
-from .models import db, SpreadMarket, SpreadMarketSchema, Bookmaker, BookmakerSchema
+from .models import db, SpreadMarket, SpreadMarketSchema, Bookmaker, BookmakerSchema, MoneylineMarket, MoneylineMarketSchema, TotalsMarket, TotalsMarketSchema
 from dotenv import load_dotenv
 import requests
 import os
@@ -89,7 +89,7 @@ class live_nba_odds_data(Resource):
         apiKey = os.getenv("API_KEY")
         #&regions=us&markets=h2h,spreads,totals
         #example req: http://localhost:5000/api/live_nba_odds_data?sport=basketball_nba&endpoint=odds&date=2023-05-17T00:00:00Z
-        odds_api_url = f"https://api.the-odds-api.com/v4/sports/{sport}/{endpoint}?apiKey={apiKey}&regions=us&markets=h2h&oddsFormat=american&dateFormat=iso&date={date}"
+        odds_api_url = f"https://api.the-odds-api.com/v4/sports/{sport}/{endpoint}?apiKey={apiKey}&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso&date={date}"
         #make request and store the data
         print("making request")
         try:
@@ -107,7 +107,6 @@ class live_nba_odds_data(Resource):
                     commence_time = data[i]["commence_time"]
                     #really a book data point
                     for book in bookmakerList:
-                        key = book["key"]
                         odds_api_bookmaker_key = book["key"]
                         odds_api_bookmaker_title = book["title"]
                         last_update = book["last_update"]
@@ -130,12 +129,104 @@ class live_nba_odds_data(Resource):
                             _bookmaker = Bookmaker(**bookMakerObj)
                             print(_bookmaker)
                             db.session.add(_bookmaker)
+                        # moneylineQuery
+                        for market in book["markets"]:
+                            if market["key"] == "h2h":
+                                moneylineDataQuery = db.session.query(MoneylineMarket).filter(
+                                    MoneylineMarket.odds_api_game_id == odds_api_game_id,
+                                    MoneylineMarket.last_update == last_update,
+                                    MoneylineMarket.commence_time == commence_time,
+                                    ).all()
+                                if moneylineDataQuery is None or len(moneylineDataQuery) == 0:
+                                    home_team = market["outcomes"][0]["name"]
+                                    away_team = market["outcomes"][1]["name"]
+                                    home_team_price = market["outcomes"][0]["price"]
+                                    away_team_price = market["outcomes"][1]["price"]
+                                    obj = {
+                                        "odds_api_game_id": odds_api_game_id,
+                                        "sport_key": sport,
+                                        "commence_time": commence_time,
+                                        "last_update": last_update,
+                                        "home_team": home_team,
+                                        "away_team": away_team,
+                                        "home_team_price": home_team_price,
+                                        "away_team_price": away_team_price,
+                                    }
+                                    #insert into db
+                                    _obj = MoneylineMarket(**obj)
+                                    print(_obj)
+                                    db.session.add(_obj)
+                            if market["key"] == "spreads":
+                                spreadDataQuery = db.session.query(SpreadMarket).filter(
+                                    SpreadMarket.odds_api_game_id == odds_api_game_id,
+                                    SpreadMarket.last_update == last_update,
+                                    SpreadMarket.commence_time == commence_time,
+                                    ).all()
+                                if spreadDataQuery is None or len(spreadDataQuery) == 0:
+                                    home_team = market["outcomes"][0]["name"]
+                                    away_team = market["outcomes"][1]["name"]
+                                    home_team_price = market["outcomes"][0]["price"]
+                                    away_team_price = market["outcomes"][1]["price"]
+                                    home_team_points = market["outcomes"][0]["point"]
+                                    away_team_points = market["outcomes"][1]["point"]
+                                    obj = {
+                                        "odds_api_game_id": odds_api_game_id,
+                                        "sport_key": sport,
+                                        "commence_time": commence_time,
+                                        "last_update": last_update,
+                                        "home_team": home_team,
+                                        "away_team": away_team,
+                                        "home_team_price": home_team_price,
+                                        "away_team_price": away_team_price,
+                                        "home_team_points": home_team_points,
+                                        "away_team_points": away_team_points,
+                                    }
+                                    #insert into db
+                                    _obj = SpreadMarket(**obj)
+                                    print(_obj)
+                                    db.session.add(_obj)
+                            if market["key"] == "totals":
+                                totalDataQuery = db.session.query(TotalsMarket).filter(
+                                    TotalsMarket.odds_api_game_id == odds_api_game_id,
+                                    TotalsMarket.last_update == last_update,
+                                    TotalsMarket.commence_time == commence_time,
+                                    ).all()
+                                if totalDataQuery is None or len(totalDataQuery) == 0:
+                                    over_price = market["outcomes"][0]["price"]
+                                    under_price = market["outcomes"][1]["price"]
+                                    over_point = market["outcomes"][0]["point"]
+                                    under_point = market["outcomes"][1]["point"]
+                                    obj = {
+                                        "odds_api_game_id": odds_api_game_id,
+                                        "sport_key": sport,
+                                        "commence_time": commence_time,
+                                        "last_update": last_update,
+                                        "over_price": over_price,
+                                        "under_price": under_price,
+                                        "over_points": over_point,
+                                        "under_points": under_point,
+                                    }
+                                    #insert into db
+                                    _obj = TotalsMarket(**obj)
+                                    print(_obj)
+                                    db.session.add(_obj)
+                        # "markets": [
+                        # {"key": "h2h", "last_update": "2023-05-14T19:45:34Z", 
+                        # "outcomes": [{"name": "Boston Celtics", "price": -270}, 
+                        # {"name": "Philadelphia 76ers", "price": 215}]}, 
+                        # {"key": "spreads", "last_update": "2023-05-14T19:45:34Z", 
+                        # "outcomes": [{"name": "Boston Celtics", "price": -110, "point": -6.5}, 
+                        # {"name": "Philadelphia 76ers", "price": -120, "point": 6.5}]}, 
+                        # {"key": "totals", "last_update": "2023-05-14T19:45:34Z", 
+                        # "outcomes": [{"name": "Over", "price": -120, "point": 200.5}, 
+                        # {"name": "Under", "price": -110, "point": 200.5}]}]
                     db.session.commit()
                     return {"message": "successfully stored data in db"}, 200
             else:
                 return {"message": "no games to store on the specified date"}, 200
         except Exception as e:
             return {'message': 'Failed to put live_nba_odds_data data: {}'.format(str(e))}, 500
+
 
 
 class index_class(Resource):
