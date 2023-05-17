@@ -139,10 +139,8 @@ class live_nba_odds_data(Resource):
             response = requests.get(odds_api_url)
             response.raise_for_status()
             data = response.json()
-            print("data received")
             #array of game objects in the data
             if len(data) > 0:
-                print("data len greater than 0")
                 for i in range(len(data)):
                     bookmakerList = data[i]["bookmakers"]
                     odds_api_game_id = data[i]["id"]
@@ -171,7 +169,6 @@ class live_nba_odds_data(Resource):
                             }
                             #insert into db
                             _bookmaker = Bookmaker(**bookMakerObj)
-                            print(_bookmaker)
                             db.session.add(_bookmaker)
                         # moneylineQuery
                         for market in book["markets"]:
@@ -200,7 +197,6 @@ class live_nba_odds_data(Resource):
                                     }
                                     #insert into db
                                     _obj = MoneylineMarket(**obj)
-                                    print(_obj)
                                     db.session.add(_obj)
                             if market["key"] == "spreads":
                                 spreadDataQuery = db.session.query(SpreadMarket).filter(
@@ -231,7 +227,6 @@ class live_nba_odds_data(Resource):
                                     }
                                     #insert into db
                                     _obj = SpreadMarket(**obj)
-                                    print(_obj)
                                     db.session.add(_obj)
                             if market["key"] == "totals":
                                 totalDataQuery = db.session.query(TotalsMarket).filter(
@@ -258,7 +253,6 @@ class live_nba_odds_data(Resource):
                                     }
                                     #insert into db
                                     _obj = TotalsMarket(**obj)
-                                    print(_obj)
                                     db.session.add(_obj)
                         # "markets": [
                         # {"key": "h2h", "last_update": "2023-05-14T19:45:34Z", 
