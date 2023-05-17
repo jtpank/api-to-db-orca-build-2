@@ -36,6 +36,8 @@ class LiveNbaData(db.Model):
     commence_time = db.Column(db.String(20))
     home_team = db.Column(db.String(23))
     away_team = db.Column(db.String(23))
+    home_team_score = db.Column(db.Integer)
+    away_team_score = db.Column(db.Integer)
 
 class LiveNbaDataSchema():
     resource_fields = {
@@ -45,6 +47,8 @@ class LiveNbaDataSchema():
         "commence_time": fields.String,
         "home_team": fields.String,
         "away_team": fields.String,
+        "home_team_score": fields.Integer,
+        "away_team_score": fields.Integer,
     }
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)
@@ -56,26 +60,26 @@ class Bookmaker(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     odds_api_game_id = db.Column(db.String(32))
     sport_key = db.Column(db.String(25))
-    odds_api_key = db.Column(db.String(30))
-    odds_api_title = db.Column(db.String(30))
+    odds_api_bookmaker_key = db.Column(db.String(30))
+    odds_api_bookmaker_title = db.Column(db.String(30))
     commence_time = db.Column(db.String(20))
-    last_update = db.Column(db.String(20), unique=True)
+    last_update = db.Column(db.String(20))
 
 class BookmakerSchema():
     resource_fields = {
         "id": fields.Integer,
         "odds_api_game_id": fields.String,
         "sport_key": fields.String,
-        "odds_api_key": fields.String,
-        "odds_api_title": fields.String,
+        "odds_api_bookmaker_key": fields.String,
+        "odds_api_bookmaker_title": fields.String,
         "commence_time": fields.String,
         "last_update": fields.String,
     }
     args_field = reqparse.RequestParser()
     args_field.add_argument("sport_key", type=str,help="sport_key is required", required=True)
     args_field.add_argument("odds_api_game_id", type=str,help="odds_api_game_id is required", required=True)
-    args_field.add_argument("odds_api_key", type=str,help="odds_api_key is required", required=True)
-    args_field.add_argument("odds_api_title", type=str,help="odds_api_title is required", required=True)
+    args_field.add_argument("odds_api_bookmaker_key", type=str,help="odds_api_bookmaker_key is required", required=True)
+    args_field.add_argument("odds_api_bookmaker_title", type=str,help="odds_api_bookmaker_title is required", required=True)
     args_field.add_argument("commence_time", type=str,help="commence_time is required", required=True)
     args_field.add_argument("last_update", type=str,help="last_update is required", required=True)
 

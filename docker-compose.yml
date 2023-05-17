@@ -23,7 +23,7 @@ services:
         adduser -D myuser &&
         chown -R myuser:myuser /api &&
         su myuser -c "pip install --user -r ./api/requirements.txt" &&
-        su myuser -c "python ./api/app.py"
+        su myuser -c "python -u ./api/app.py"
       '
   historical-nba-database:
     image: mysql:latest
