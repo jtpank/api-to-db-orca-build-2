@@ -113,7 +113,7 @@ class live_nba_game_scores_route(Resource):
                         gameScoreQuery.away_team_score = away_team_score
                         gameScoreQuery.completed = completed
                 db.session.commit()
-                return {"message": "successfully stored nba games in db"}, 200
+                return {"message": "successfully stored nba games in db", "data" : data}, 200
             else:
                 return {"message": "no nba live / upcoming games to store on the specified date"}, 200
         except Exception as e:
