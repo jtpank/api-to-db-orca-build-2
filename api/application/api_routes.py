@@ -285,11 +285,20 @@ class get_nba_games(Resource):
                         LiveNbaData.commence_time.between(start_time, end_time)
                         ).all()
             if gameScoreQuery is not None:
+                data = []
                 for record in gameScoreQuery:
-                    print("odds_api_game_id:", record.odds_api_game_id)
-                    print("sport_key:", record.sport_key)
-                    print("commence_time:", record.commence_time)
-            return {"data" : "hi from get"}, 200
+                    item = {
+                        "odds_api_game_id": record.odds_api_game_id,
+                        "sport_key": record.sport_key,
+                        "commence_time": record.commence_time,
+                        "home_team": record.home_team,
+                        "away_team": record.away_team,
+                        "home_team_score": record.home_team_score,
+                        "away_team_score": record.away_team_score,
+                        "completed": record.completed,
+                    }
+                data.append(item)
+            return {"data" : data}, 200
         except Exception as e:
             return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
 
