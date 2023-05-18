@@ -96,12 +96,8 @@ class live_nba_game_scores_route(Resource):
                     gameScoreQuery = db.session.query(LiveNbaData).filter(
                         LiveNbaData.odds_api_game_id == odds_api_game_id,
                         ).first()
-                    print("*************************************")
-                    print(odds_api_game_id)
-                    print(gameScoreQuery)
                     if gameScoreQuery is None:
                         #insert into db
-                        print("gameScore Query IS NONE")
                         obj = {
                             "odds_api_game_id": odds_api_game_id,
                             "sport_key": sport_key,
@@ -115,11 +111,10 @@ class live_nba_game_scores_route(Resource):
                         _obj = LiveNbaData(**obj)
                         db.session.add(_obj)
                     else:
-                        print("gameScore Query is NOT NONE")
                         gameScoreQuery.home_team_score = home_team_score
                         gameScoreQuery.away_team_score = away_team_score
                         gameScoreQuery.completed = completed
-                        db.session.flush()
+                        db.session.commit()
                 db.session.commit()
                 return {"message": "successfully stored nba games in db", "data" : data}, 200
             else:
@@ -140,7 +135,6 @@ class live_nba_odds_data(Resource):
         #example req: http://localhost:5000/api/live_nba_odds_data?sport=basketball_nba&endpoint=odds&date=2023-05-17T00:00:00Z
         odds_api_url = f"https://api.the-odds-api.com/v4/sports/{sport}/{endpoint}?apiKey={apiKey}&regions=us&markets=h2h,spreads,totals&oddsFormat=american&dateFormat=iso&date={date}"
         #make request and store the data
-        print("making request")
         try:
             response = requests.get(odds_api_url)
             response.raise_for_status()
@@ -291,13 +285,9 @@ class get_nba_games(Resource):
                         LiveNbaData.commence_time.between(start_time, end_time),
                         LiveNbaData.completed == False,
                         ).all()
-            print(gameScoreQuery)
             data = []
             if gameScoreQuery is not None:
-                print("not none")
                 for record in gameScoreQuery:
-                    print("record found in get nba games")
-                    print(record)
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
                         "sport_key": record.sport_key,
@@ -326,10 +316,8 @@ class get_pre_nba_game_odds_h2h_data(Resource):
                         MoneylineMarket.last_update.between(start_time, end_time),
                         MoneylineMarket.odds_api_bookmaker_key == bookmaker_key,
                         ).all()
-            print(marketQuery)
             data = []
             if marketQuery is not None:
-                print("not none")
                 for record in marketQuery:
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
@@ -360,10 +348,8 @@ class get_pre_nba_game_odds_spread_data(Resource):
                         SpreadMarket.last_update.between(start_time, end_time),
                         SpreadMarket.odds_api_bookmaker_key == bookmaker_key,
                         ).all()
-            print(marketQuery)
             data = []
             if marketQuery is not None:
-                print("not none")
                 for record in marketQuery:
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
@@ -396,10 +382,8 @@ class get_pre_nba_game_odds_totals_data(Resource):
                         TotalsMarket.last_update.between(start_time, end_time),
                         TotalsMarket.odds_api_bookmaker_key == bookmaker_key,
                         ).all()
-            print(marketQuery)
             data = []
             if marketQuery is not None:
-                print("not none")
                 for record in marketQuery:
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
