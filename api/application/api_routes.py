@@ -309,27 +309,26 @@ class get_nba_games(Resource):
 
 class get_pre_nba_game_odds_h2h_data(Resource):
     def get(self):
-        #to our own db now
+               #to our own db now
         bookmaker_key = request.args.get('bookmakerKey', default = "", type = str)
-        date_str = request.args.get('date', default = "", type = str)
+        start_time_str = request.args.get('startDate', default = "", type = str)
+        end_time_str = request.args.get('endDate', default = "", type = str)
         try:
-            date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
-            start_time = date - timedelta(hours=72)
-            end_time = date + timedelta(hours=72)
-            moneylineQuery = db.session.query(MoneylineMarket).filter(
-                        MoneylineMarket.commence_time > start_time,
+            start_time = datetime.strptime(start_time_str, "%Y-%m-%dT%H:%M:%SZ")
+            end_time = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M:%SZ")
+            marketQuery = db.session.query(MoneylineMarket).filter(
+                        MoneylineMarket.last_update.between(start_time, end_time),
                         MoneylineMarket.odds_api_bookmaker_key == bookmaker_key,
-                        MoneylineMarket.completed == False,
                         ).all()
-            print(moneylineQuery)
+            print(marketQuery)
             data = []
-            if moneylineQuery is not None:
+            if marketQuery is not None:
                 print("not none")
-                for record in moneylineQuery:
+                for record in marketQuery:
                     item = {
                         "odds_api_game_id": record.odds_api_game_id,
                         "sport_key": record.sport_key,
-                        "odds_api_bookmaker_key": fields.String,
+                        "odds_api_bookmaker_key": record.odds_api_bookmaker_key,
                         "commence_time": record.commence_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
                         "last_update": record.last_update.strftime("%Y-%m-%dT%H:%M:%SZ"),
                         "home_team": record.home_team,
@@ -340,7 +339,77 @@ class get_pre_nba_game_odds_h2h_data(Resource):
                     data.append(item)
             return {"data" : data}, 200
         except Exception as e:
-            return {'message': 'Failed to get get_nba_games internal api data: {}'.format(str(e))}, 500
+            return {'message': 'Failed to get moneyline internal api data: {}'.format(str(e))}, 500
+
+class get_pre_nba_game_odds_spread_data(Resource):
+    def get(self):
+        #to our own db now
+        bookmaker_key = request.args.get('bookmakerKey', default = "", type = str)
+        start_time_str = request.args.get('startDate', default = "", type = str)
+        end_time_str = request.args.get('endDate', default = "", type = str)
+        try:
+            start_time = datetime.strptime(start_time_str, "%Y-%m-%dT%H:%M:%SZ")
+            end_time = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M:%SZ")
+            marketQuery = db.session.query(SpreadMarket).filter(
+                        SpreadMarket.last_update.between(start_time, end_time),
+                        SpreadMarket.odds_api_bookmaker_key == bookmaker_key,
+                        ).all()
+            print(marketQuery)
+            data = []
+            if marketQuery is not None:
+                print("not none")
+                for record in marketQuery:
+                    item = {
+                        "odds_api_game_id": record.odds_api_game_id,
+                        "sport_key": record.sport_key,
+                        "odds_api_bookmaker_key": record.odds_api_bookmaker_key,
+                        "commence_time": record.commence_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "last_update": record.last_update.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "home_team": record.home_team,
+                        "away_team": record.away_team,
+                        "home_team_price": record.home_team_price,
+                        "away_team_price": record.home_team_price,
+                        "home_team_points": record.home_team_points,
+                        "away_team_points": record.away_team_points,
+                    }
+                    data.append(item)
+            return {"data" : data}, 200
+        except Exception as e:
+            return {'message': 'Failed to get spread internal api data: {}'.format(str(e))}, 500
+
+class get_pre_nba_game_odds_totals_data(Resource):
+    def get(self):
+        #to our own db now
+        bookmaker_key = request.args.get('bookmakerKey', default = "", type = str)
+        start_time_str = request.args.get('startDate', default = "", type = str)
+        end_time_str = request.args.get('endDate', default = "", type = str)
+        try:
+            start_time = datetime.strptime(start_time_str, "%Y-%m-%dT%H:%M:%SZ")
+            end_time = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M:%SZ")
+            marketQuery = db.session.query(TotalsMarket).filter(
+                        TotalsMarket.last_update.between(start_time, end_time),
+                        TotalsMarket.odds_api_bookmaker_key == bookmaker_key,
+                        ).all()
+            print(marketQuery)
+            data = []
+            if marketQuery is not None:
+                print("not none")
+                for record in marketQuery:
+                    item = {
+                        "odds_api_game_id": record.odds_api_game_id,
+                        "sport_key": record.sport_key,
+                        "odds_api_bookmaker_key": record.odds_api_bookmaker_key,
+                        "commence_time": record.commence_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "last_update": record.last_update.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "over_price":   record.over_price,
+                        "under_price":  record.under_price,
+                        "over_points":  record.over_points,
+                        "under_points": record.under_points
+                    }
+                    data.append(item)
+            return {"data" : data}, 200
+        except Exception as e:
+            return {'message': 'Failed to get totals internal api data: {}'.format(str(e))}, 500
 
 class index_class(Resource):
     def get(self):
@@ -351,3 +420,5 @@ api.add_resource(live_nba_game_scores_route, '/api/live-nba-scores-data')
 api.add_resource(live_nba_odds_data, '/api/live-nba-odds-data')
 api.add_resource(get_nba_games, '/api/get/live-nba-scores-data')
 api.add_resource(get_pre_nba_game_odds_h2h_data, '/api/get/pre-game-nba-odds-h2h-data')
+api.add_resource(get_pre_nba_game_odds_spread_data, '/api/get/pre-game-nba-odds-spread-data')
+api.add_resource(get_pre_nba_game_odds_totals_data, '/api/get/pre-game-nba-odds-totals-data')
