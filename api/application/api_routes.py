@@ -99,8 +99,11 @@ class live_nba_game_scores_route(Resource):
                         LiveNbaData.sport_key == sport_key,
                         LiveNbaData.commence_time == commence_time,
                         ).first()
+                    print("*************************************")
+                    print(gameScoreQuery)
                     if gameScoreQuery is None:
                         #insert into db
+                        print("gameScore Query IS NONE")
                         obj = {
                             "odds_api_game_id": odds_api_game_id,
                             "sport_key": sport_key,
@@ -114,6 +117,7 @@ class live_nba_game_scores_route(Resource):
                         _obj = LiveNbaData(**obj)
                         db.session.add(_obj)
                     else:
+                        print("gameScore Query is NOT NONE")
                         gameScoreQuery.home_team_score = home_team_score
                         gameScoreQuery.away_team_score = away_team_score
                         gameScoreQuery.completed = completed
