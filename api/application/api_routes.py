@@ -95,10 +95,9 @@ class live_nba_game_scores_route(Resource):
                     #now make the query and store it if doesn't exist
                     gameScoreQuery = db.session.query(LiveNbaData).filter(
                         LiveNbaData.odds_api_game_id == odds_api_game_id,
-                        LiveNbaData.sport_key == sport_key,
-                        LiveNbaData.commence_time == commence_time,
                         ).first()
                     print("*************************************")
+                    print(odds_api_game_id)
                     print(gameScoreQuery)
                     if gameScoreQuery is None:
                         #insert into db
