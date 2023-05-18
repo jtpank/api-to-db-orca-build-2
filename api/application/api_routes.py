@@ -100,6 +100,7 @@ class live_nba_game_scores_route(Resource):
                         LiveNbaData.commence_time == commence_time,
                         ).first()
                     if gameScoreQuery is None:
+                        #insert into db
                         obj = {
                             "odds_api_game_id": odds_api_game_id,
                             "sport_key": sport_key,
@@ -110,13 +111,14 @@ class live_nba_game_scores_route(Resource):
                             "away_team_score": away_team_score,
                             "completed" : completed,
                         }
-                        #insert into db
                         _obj = LiveNbaData(**obj)
                         db.session.add(_obj)
                     else:
                         gameScoreQuery.home_team_score = home_team_score
                         gameScoreQuery.away_team_score = away_team_score
                         gameScoreQuery.completed = completed
+                        _obj = LiveNbaData(**gameScoreQuery)
+                        db.session.add(_obj)
                 db.session.commit()
                 return {"message": "successfully stored nba games in db", "data" : data}, 200
             else:
