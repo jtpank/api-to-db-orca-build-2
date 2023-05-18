@@ -64,11 +64,14 @@ class live_nba_game_scores_route(Resource):
         sport = request.args.get('sport', default = "", type = str)
         endpoint = request.args.get('endpoint', default = "", type = str)
         date = request.args.get('date', default = "", type = str)
+        daysFrom = request.args.get('daysFrom', default="", type = str)
         apiKey = os.getenv("API_KEY")
         #&regions=us&markets=h2h,spreads,totals
         #example req: http://localhost:5000/api/live_nba_odds_data?sport=basketball_nba&endpoint=odds&date=2023-05-17T00:00:00Z
         #https://api.the-odds-api.com/v4/sports/basketball_nba/scores?apiKey=f2c87d0ea0ee1e114c5e603c9693aa7b&dateFormat=iso&date=2023-05-17T00:00:00Z
         odds_api_url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores?apiKey={apiKey}&dateFormat=iso&date={date}"
+        if daysFrom:
+            odds_api_url = f"https://api.the-odds-api.com/v4/sports/{sport}/scores?apiKey={apiKey}&dateFormat=iso&daysFrom={daysFrom}&date={date}"
         #make request and store the data
         try:
             response = requests.get(odds_api_url)
@@ -416,8 +419,12 @@ class index_class(Resource):
         return {"api-for-orca-to-db" : "index_page"}
 #add resources
 api.add_resource(index_class, '/api')
+
+#The odds api routes
 api.add_resource(live_nba_game_scores_route, '/api/live-nba-scores-data')
 api.add_resource(live_nba_odds_data, '/api/live-nba-odds-data')
+
+#My custom database api routes
 api.add_resource(get_nba_games, '/api/get/live-nba-scores-data')
 api.add_resource(get_pre_nba_game_odds_h2h_data, '/api/get/pre-game-nba-odds-h2h-data')
 api.add_resource(get_pre_nba_game_odds_spread_data, '/api/get/pre-game-nba-odds-spread-data')
