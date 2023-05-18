@@ -79,7 +79,6 @@ class live_nba_game_scores_route(Resource):
             data = response.json()
             #array of game objects in the data
             if len(data) > 0:
-                print("data len greater than 0")
                 for i in range(len(data)):
                     odds_api_game_id = data[i]["id"]
                     sport_key = data[i]["sport_key"]
@@ -121,8 +120,7 @@ class live_nba_game_scores_route(Resource):
                         gameScoreQuery.home_team_score = home_team_score
                         gameScoreQuery.away_team_score = away_team_score
                         gameScoreQuery.completed = completed
-                        _obj = LiveNbaData(**gameScoreQuery)
-                        db.session.add(_obj)
+                        db.session.flush()
                 db.session.commit()
                 return {"message": "successfully stored nba games in db", "data" : data}, 200
             else:
